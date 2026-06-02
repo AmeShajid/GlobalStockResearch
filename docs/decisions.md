@@ -31,3 +31,43 @@ Append-only record of nontrivial choices. Each entry follows the format below. E
 **Alternatives considered:** Single monolithic `CLAUDE.md` (rejected — too long, attention dilutes). Multiple area-specific `CLAUDE.md` files only (rejected — does not address the review/specialist use case that subagents handle better).
 
 **Consequences:** Cleaner top-of-context prompts. Subagents bring fresh-eyes review without bloating the main session. Requires the discipline of knowing which tier a piece of information belongs to.
+
+### 2026-06-01 — Install Node 20 via nvm-windows rather than the direct installer
+
+**Context:** Phase 0.1 calls for Node.js 20 LTS. The machine initially had Node v24 installed, which is outside the spec.
+
+**Decision:** Use nvm-windows (Node Version Manager for Windows) to install and select Node 20 LTS, rather than the direct nodejs.org Windows installer. Rationale: nvm-windows keeps multiple Node versions available side-by-side. We had v24 installed initially and needed to swap to v20 LTS for spec compliance; nvm makes that a one-command switch and lets us return to other versions without reinstalling.
+
+**Alternatives considered:** Direct nodejs.org .msi installer (rejected — it manages only a single global Node version, so swapping away from the pre-existing v24 and keeping the option to switch back is awkward). Uninstalling v24 and installing v20 via .msi (rejected — loses the ability to keep multiple versions side-by-side).
+
+**Consequences:** Easier to satisfy the spec's exact-version requirement and to change Node versions later. Adds nvm-windows as a tool the developer must be aware of (the active version is set with `nvm use`, not by reinstalling).
+
+### 2026-06-01 — Keep Microsoft Store Python 3.11.9 instead of the python.org build
+
+**Context:** Phase 0.1 requires `python --version` to report 3.11.x. The machine already had Python 3.11.9 installed from the Microsoft Store, while the blueprint's install instructions describe the python.org installer.
+
+**Decision:** Keep the existing Microsoft Store Python 3.11.9 build for now. Rationale: it passes the Phase 0.1 DoD as-is. The Microsoft Store build is a known quantity and avoids an unnecessary reinstall. We may revisit in Phase 0.5 if virtual-environment issues arise.
+
+**Alternatives considered:** Uninstall and reinstall from python.org (rejected for now — the Store build already passes the Definition of Done, so reinstalling is effort without immediate benefit).
+
+**Consequences:** Phase 0.1 is satisfied without extra work. The Store build sandboxes some paths differently from the python.org build, which can occasionally affect virtual environments and global tool installs. We may revisit this in Phase 0.5 if virtual-environment issues arise.
+
+### 2026-06-01 — Manually add PostgreSQL 16 bin directory to system PATH
+
+**Context:** After installing PostgreSQL 16 via the EnterpriseDB Windows installer, `psql` was not findable from any terminal even though the `postgresql-x64-16` Windows service was running and pgAdmin connected fine.
+
+**Decision:** Manually add `C:\Program Files\PostgreSQL\16\bin` to the system PATH. Rationale: the EnterpriseDB installer does not add the bin directory to PATH automatically on Windows 11. Without this, `psql` and the other command-line tools are not on PATH despite the database itself running correctly. This is a Windows-specific gotcha worth remembering for future PostgreSQL installs.
+
+**Alternatives considered:** Always invoking `psql` by full path (rejected — tedious and error-prone). Relying on pgAdmin only (rejected — command-line `psql` is needed for scripts and verification steps).
+
+**Consequences:** `psql` and the PostgreSQL CLI tools now work from any terminal, which the Phase 0.1 DoD and later verification steps depend on. Future PostgreSQL upgrades to a new major version will need the PATH updated to the new version's bin directory.
+
+### 2026-06-01 — CPU-only inference path for FinBERT and Ollama (AMD GPU on primary machine)
+
+**Context:** The primary Windows machine has an AMD GPU, not an NVIDIA one, so CUDA acceleration is unavailable for FinBERT (PyTorch) and Ollama.
+
+**Decision:** Run FinBERT and Ollama inference CPU-only on this machine. Do not install CUDA Toolkit or treat `nvidia-smi`/`torch.cuda.is_available()` as part of the Definition of Done. Rationale: Ollama runs fine on CPU, just slower than on NVIDIA. The 2-hour summary cache from Phase 7.4 absorbs the latency, since summaries are not regenerated constantly. FinBERT inference will be a few seconds per post, which is acceptable in batched mode.
+
+**Alternatives considered:** Pursuing AMD GPU acceleration via ROCm/DirectML (rejected — immature and unsupported on Windows for this stack, high setup cost for a personal tool). Buying/using an NVIDIA GPU (rejected — out of scope for a personal project right now).
+
+**Consequences:** No CUDA dependency to manage; the GPU-related Phase 0.2 steps are skipped on this machine. Inference is slower, so historical/batch imports should favor off-peak or overnight runs. The sequential FinBERT-then-Ollama constraint still applies (both compete for CPU/RAM). If throughput becomes a problem later, an NVIDIA GPU would unlock CUDA without code changes (PyTorch picks up CUDA automatically).
