@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "PowerShell(Move-Item *)",
-      "PowerShell(Get-ChildItem -Force -Recurse -Path CLAUDE.md, .gitignore, .claude, docs | Where-Object { -not $_.PSIsContainer } | Select-Object FullName, Length | Format-Table -AutoSize)"
+      "PowerShell(Get-ChildItem -Force -Recurse -Path CLAUDE.md, .gitignore, .claude, docs | Where-Object { -not $_.PSIsContainer } | Select-Object FullName, Length | Format-Table -AutoSize)",
+      "PowerShell(winget install *)"
     ]
   }
 }

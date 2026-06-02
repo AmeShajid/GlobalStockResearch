@@ -1,32 +1,34 @@
 # Current Phase
 
+> Phase 0.1 (Install Core Software — Windows) completed 2026-06-01. All Definition of Done checks passed.
+
 ## Active phase
-Phase 0.1 — Install Core Software (Windows)
+Phase 0.2 — Install Ollama (Windows)
 
 ## What is in scope
-- Install VSCode, Windows Terminal, Python 3.11 (with Add to PATH checked), Node.js 20 LTS, Git for Windows, PostgreSQL 16, pgAdmin 4
-- Optional: PowerShell 7
-- Verify each tool launches and reports a version
-- Record PostgreSQL master password securely (in a password manager, outside the repo)
+- Install Ollama for Windows from ollama.com (native Windows installer — no WSL needed)
+- Pull the primary model: `ollama pull qwen2.5` (~4GB download)
+- Pull the backup model: `ollama pull llama3`
+- Note the GPU/RAM constraint: FinBERT and Ollama must never run simultaneously (sequential processing only)
 
 ## What is explicitly out of scope
-- Any Python library installation (Phase 1.2)
+- Any Python library installation, including PyTorch/FinBERT (Phase 1.2)
+- Writing the sequential FinBERT → Ollama processing scripts (later milestones)
+- VSCode extension setup (Phase 0.3)
+- Project folder structure and config file (Phase 0.4)
 - Any database schema creation (Phase 0.7)
-- Any code (no implementation work yet, only environment setup)
 - Any other milestone work
 - Mac setup (handled in Appendix F separately, not now)
 
 ## Definition of Done
-- `python --version` returns 3.11.x
-- `node --version` returns v20.x.x
-- `psql --version` returns PostgreSQL 16.x
-- `code --version` returns a version
-- `git --version` returns a version
-- pgAdmin 4 opens and connects to local PostgreSQL
-- PostgreSQL Windows Service is running (verify in services.msc)
-- All passwords/credentials stored outside the repo (in a password manager)
+- Ollama for Windows is installed and the `ollama` command is available in a terminal
+- `ollama pull qwen2.5` completed successfully (model present in `ollama list`)
+- `ollama pull llama3` completed successfully (model present in `ollama list`)
+- Ollama responds to a test prompt: `ollama run qwen2.5 "say hello"` returns a reply
 
 ## Notes
-- Last updated: [date]
-- Estimated time to complete: 45-90 minutes (slower than Mac because installers are not bundled)
-- After completion, move to Phase 0.2 (Ollama for Windows)
+- Last updated: 2026-06-01
+- Estimated time to complete: 15-40 minutes (mostly model download time; depends on connection speed)
+- Reminder: never run FinBERT and Ollama at the same time — running both exhausts GPU memory regardless of card. Scripts process sequentially (all FinBERT scoring first, then Ollama summaries).
+- CPU-only inference for FinBERT and Ollama on this machine (AMD GPU, no CUDA). This is acceptable — Ollama runs fine on CPU, just slower than NVIDIA. The 2-hour summary cache from Phase 7.4 absorbs the latency. FinBERT inference will be a few seconds per post, which is fine in batched mode.
+- After completion, move to Phase 0.3 (Set Up VSCode Extensions)
