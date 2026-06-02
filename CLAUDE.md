@@ -67,6 +67,35 @@ For every task:
 - "95%+ confident this is complete and correct" → proceed
 - "Less than 95%" → list concerns, get approval
 
+## Phase Start Ritual
+
+At the start of every session where the user mentions a phase number or a branch name like `phase-X.Y-*`, automatically do the following before any work:
+
+1. Read `docs/current_phase.md` in full.
+2. Read the matching phase section in `docs/blueprint.md` (section 2.7 covers Milestone 0; later sections cover Milestones 1+).
+3. Read any entries in `docs/decisions.md` flagged as relevant to the current phase.
+4. Summarize back: scope, out-of-scope, Definition of Done, and the first concrete step.
+5. State confidence and wait for approval before starting any work.
+
+## Phase End Ritual
+
+When all Definition of Done checks for the current phase have passed AND the user confirms completion, automatically do the following in this exact order, stopping between each step for the user's approval:
+
+1. **Update `docs/current_phase.md`:**
+   - Add a brief completion note at the top with today's date and the DoD checks that passed.
+   - Update "Active phase" to the next phase.
+   - Read the next phase's section in `docs/blueprint.md` and rewrite "What is in scope," "What is explicitly out of scope," "Definition of Done," and "Notes" to match.
+   - Keep the same structure.
+2. **Append to `docs/decisions.md`** any decisions made during the phase that aren't already logged. Use the existing template format (Context / Decision / Alternatives / Consequences). If nothing notable came up, skip this step and tell the user so.
+3. **Run `git status`** (read-only) and show the user what files changed. Do NOT run `git add`, `git commit`, or `git push` — the user commits themselves.
+4. **Remind the user of the post-commit branch workflow:**
+   - `git add . && git commit -m "..."`
+   - `git push --set-upstream origin <current-branch>` (first time) or `git push`
+   - Merge to main via GitHub PR, or locally with `git checkout main && git merge <branch> && git push`
+   - `git branch -d <branch>` and `git push origin --delete <branch>`
+   - `git checkout -b phase-X.Y-<next-phase-name>`
+   - Restart Claude Code for a clean context.
+
 ## Session Management
 
 - Long session (20+ exchanges)? Suggest `/clear` or new session

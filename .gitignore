@@ -67,3 +67,6 @@ notebooks/.ipynb_checkpoints/
 
 # Local Claude artifacts (optional — many projects commit .claude/agents/)
 # .claude/
+
+# Machine-local Claude Code permission state (not project history)
+.claude/settings.local.json

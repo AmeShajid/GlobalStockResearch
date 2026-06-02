@@ -81,3 +81,13 @@ Append-only record of nontrivial choices. Each entry follows the format below. E
 **Alternatives considered:** Keeping the model permanently resident in RAM via a long Ollama keep-alive (rejected for now — wastes RAM that FinBERT needs under the sequential-processing constraint, and the Phase 7.4 cache already solves the user-facing latency). Pursuing GPU acceleration (already rejected in the prior entry — AMD/ROCm immature on Windows).
 
 **Consequences:** The first inference after the model is unloaded pays a one-time load cost (~1-2 min). Subsequent inferences within the same Ollama session are much faster because the model stays loaded in RAM until it is evicted or Ollama is idle past its keep-alive window. This makes the Phase 7.4 summary cache important rather than optional for dashboard responsiveness, and reinforces favoring batched/overnight runs for any work that would otherwise trigger repeated cold loads.
+
+### 2026-06-02 — Use `ms-ossdata.vscode-pgsql` for the PostgreSQL VSCode extension (blueprint ID was deprecated)
+
+**Context:** Phase 0.3 specified installing the PostgreSQL extension by the ID `ms-ossdata.vscode-postgresql` (named in `blueprint.md` §2.7 and `current_phase.md`). During installation, `code --install-extension ms-ossdata.vscode-postgresql` failed with "Extension not found" — that ID is Microsoft's older, now-deprecated PostgreSQL extension and is no longer installable from the marketplace.
+
+**Decision:** Install Microsoft's current official PostgreSQL extension `ms-ossdata.vscode-pgsql` (same publisher, `ms-ossdata`) instead, and correct the dead ID in `blueprint.md` §2.7 Phase 0.3 and `current_phase.md` so the docs match reality. Rationale: it is the same intended technology (the official Microsoft PostgreSQL extension), just the current ID; the older `vscode-postgresql` extension is deprecated and uninstallable.
+
+**Alternatives considered:** Installing a third-party PostgreSQL extension (rejected — the spec calls for the official Microsoft one, and substituting an unrelated publisher would be a real technology change). Leaving the PostgreSQL extension uninstalled (rejected — it is part of the Phase 0.3 Definition of Done). Keeping the docs pointing at the dead ID (rejected — future installs would hit the same failure).
+
+**Consequences:** Phase 0.3 DoD is met with the working extension. The docs now name the correct, installable ID. If a future blueprint revision still references `ms-ossdata.vscode-postgresql`, it should be read as `ms-ossdata.vscode-pgsql`.

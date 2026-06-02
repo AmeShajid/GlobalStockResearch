@@ -530,7 +530,9 @@ Download and install **Ollama for Windows** from ollama.com (it has a native Win
 
 ### Phase 0.3 — Set Up VSCode Extensions
 
-Install: Python, Pylance, ESLint, Prettier, PostgreSQL (the `ms-ossdata.vscode-postgresql` one), GitLens, and Jupyter.
+Install: Python, Pylance, ESLint, Prettier, PostgreSQL (the official Microsoft `ms-ossdata.vscode-pgsql` one), GitLens, and Jupyter.
+
+> Note: earlier drafts named the PostgreSQL extension `ms-ossdata.vscode-postgresql`. That is Microsoft's older, now-deprecated extension and no longer installs via `code --install-extension`. Use the current official ID `ms-ossdata.vscode-pgsql` (same publisher).
 
 ---
 
