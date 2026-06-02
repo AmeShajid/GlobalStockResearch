@@ -1,34 +1,38 @@
 # Current Phase
 
-> Phase 0.1 (Install Core Software — Windows) completed 2026-06-01. All Definition of Done checks passed.
+> Phase 0.2 (Install Ollama — Windows) completed 2026-06-01. All Definition of Done checks passed: Ollama 0.30.0 installed via winget, qwen2.5 pulled (4.7GB), llama3 pulled (4.7GB), test prompt `ollama run qwen2.5 "say hello"` returned a reply.
 
 ## Active phase
-Phase 0.2 — Install Ollama (Windows)
+Phase 0.3 — Set Up VSCode Extensions
 
 ## What is in scope
-- Install Ollama for Windows from ollama.com (native Windows installer — no WSL needed)
-- Pull the primary model: `ollama pull qwen2.5` (~4GB download)
-- Pull the backup model: `ollama pull llama3`
-- Note the GPU/RAM constraint: FinBERT and Ollama must never run simultaneously (sequential processing only)
+- Install the following VSCode extensions:
+  - Python
+  - Pylance
+  - ESLint
+  - Prettier
+  - PostgreSQL — specifically the `ms-ossdata.vscode-postgresql` extension
+  - GitLens
+  - Jupyter
 
 ## What is explicitly out of scope
-- Any Python library installation, including PyTorch/FinBERT (Phase 1.2)
-- Writing the sequential FinBERT → Ollama processing scripts (later milestones)
-- VSCode extension setup (Phase 0.3)
 - Project folder structure and config file (Phase 0.4)
-- Any database schema creation (Phase 0.7)
+- Python virtual environment setup (Phase 0.5)
+- Git/GitHub configuration and `.gitignore` (Phase 0.6)
+- Database creation in pgAdmin (Phase 0.7)
+- Any Python library installation, including PyTorch/FinBERT (Phase 1.2)
 - Any other milestone work
 - Mac setup (handled in Appendix F separately, not now)
 
 ## Definition of Done
-- Ollama for Windows is installed and the `ollama` command is available in a terminal
-- `ollama pull qwen2.5` completed successfully (model present in `ollama list`)
-- `ollama pull llama3` completed successfully (model present in `ollama list`)
-- Ollama responds to a test prompt: `ollama run qwen2.5 "say hello"` returns a reply
+- All seven extensions are installed and enabled in VSCode:
+  Python, Pylance, ESLint, Prettier, PostgreSQL (`ms-ossdata.vscode-postgresql`), GitLens, Jupyter
+- Each extension appears in the VSCode Extensions panel as installed (not just searched)
 
 ## Notes
 - Last updated: 2026-06-01
-- Estimated time to complete: 15-40 minutes (mostly model download time; depends on connection speed)
-- Reminder: never run FinBERT and Ollama at the same time — running both exhausts GPU memory regardless of card. Scripts process sequentially (all FinBERT scoring first, then Ollama summaries).
-- CPU-only inference for FinBERT and Ollama on this machine (AMD GPU, no CUDA). This is acceptable — Ollama runs fine on CPU, just slower than NVIDIA. The 2-hour summary cache from Phase 7.4 absorbs the latency. FinBERT inference will be a few seconds per post, which is fine in batched mode.
-- After completion, move to Phase 0.3 (Set Up VSCode Extensions)
+- Estimated time to complete: 5-15 minutes (extension downloads are small)
+- Pylance is the language server that powers Python IntelliSense; it installs alongside the Python extension but confirm it is present and enabled.
+- ESLint and Prettier are for the Next.js/React frontend (Milestone 7); install them now so the environment is ready.
+- The PostgreSQL extension has multiple options in the marketplace — install the official `ms-ossdata.vscode-postgresql` one specifically.
+- After completion, move to Phase 0.4 (Create Project Folder Structure and Config File)

@@ -71,3 +71,13 @@ Append-only record of nontrivial choices. Each entry follows the format below. E
 **Alternatives considered:** Pursuing AMD GPU acceleration via ROCm/DirectML (rejected — immature and unsupported on Windows for this stack, high setup cost for a personal tool). Buying/using an NVIDIA GPU (rejected — out of scope for a personal project right now).
 
 **Consequences:** No CUDA dependency to manage; the GPU-related Phase 0.2 steps are skipped on this machine. Inference is slower, so historical/batch imports should favor off-peak or overnight runs. The sequential FinBERT-then-Ollama constraint still applies (both compete for CPU/RAM). If throughput becomes a problem later, an NVIDIA GPU would unlock CUDA without code changes (PyTorch picks up CUDA automatically).
+
+### 2026-06-01 — qwen2.5 first-token latency on CPU is noticeable; rely on the Phase 7.4 summary cache
+
+**Context:** During Phase 0.2 verification, the first `ollama run qwen2.5 "say hello"` took noticeably long — roughly 1-2 minutes for the initial model load plus first response. This is the expected behavior of CPU-only inference (AMD GPU on this machine, no CUDA — see prior entry), where the ~4.7GB model must be loaded from disk into RAM before the first token is produced.
+
+**Decision:** Treat noticeable cold-start latency as a known, accepted characteristic of CPU-only Ollama on this machine rather than a problem to optimize away now. Lean on the 2-hour summary cache from Phase 7.4 to keep the dashboard responsive: summaries are generated once and served from cache for two hours, so users rarely trigger a live cold inference while browsing.
+
+**Alternatives considered:** Keeping the model permanently resident in RAM via a long Ollama keep-alive (rejected for now — wastes RAM that FinBERT needs under the sequential-processing constraint, and the Phase 7.4 cache already solves the user-facing latency). Pursuing GPU acceleration (already rejected in the prior entry — AMD/ROCm immature on Windows).
+
+**Consequences:** The first inference after the model is unloaded pays a one-time load cost (~1-2 min). Subsequent inferences within the same Ollama session are much faster because the model stays loaded in RAM until it is evicted or Ollama is idle past its keep-alive window. This makes the Phase 7.4 summary cache important rather than optional for dashboard responsiveness, and reinforces favoring batched/overnight runs for any work that would otherwise trigger repeated cold loads.
