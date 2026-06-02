@@ -3,7 +3,11 @@
     "allow": [
       "PowerShell(Move-Item *)",
       "PowerShell(Get-ChildItem -Force -Recurse -Path CLAUDE.md, .gitignore, .claude, docs | Where-Object { -not $_.PSIsContainer } | Select-Object FullName, Length | Format-Table -AutoSize)",
-      "PowerShell(winget install *)"
+      "PowerShell(winget install *)",
+      "PowerShell(ollama pull *)",
+      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\('Path','Machine'\\) + ';' + [System.Environment]::GetEnvironmentVariable\\('Path','User'\\); \\(Get-Command ollama\\).Source)",
+      "PowerShell(ollama list *)",
+      "PowerShell(ollama run *)"
     ]
   }
 }
