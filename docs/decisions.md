@@ -91,3 +91,13 @@ Append-only record of nontrivial choices. Each entry follows the format below. E
 **Alternatives considered:** Installing a third-party PostgreSQL extension (rejected — the spec calls for the official Microsoft one, and substituting an unrelated publisher would be a real technology change). Leaving the PostgreSQL extension uninstalled (rejected — it is part of the Phase 0.3 Definition of Done). Keeping the docs pointing at the dead ID (rejected — future installs would hit the same failure).
 
 **Consequences:** Phase 0.3 DoD is met with the working extension. The docs now name the correct, installable ID. If a future blueprint revision still references `ms-ossdata.vscode-postgresql`, it should be read as `ms-ossdata.vscode-pgsql`.
+
+### 2026-06-02 — Defer `config.yaml` YAML parse validation from Phase 0.4 to Phase 0.5
+
+**Context:** Phase 0.4's Definition of Done includes verifying `config/config.yaml` loads via `yaml.safe_load` (`python -c "import yaml, pathlib; yaml.safe_load(pathlib.Path('config/config.yaml').read_text()); print('config ok')"`). PyYAML is not installed yet — it belongs to the venv/dependency phases (Phase 0.5 creates the venv; library installs are Phase 1.2 territory). Phase 0.4 explicitly forbids library installation in its out-of-scope list, so the exact DoD command could not run inside Phase 0.4.
+
+**Decision:** Defer the `yaml.safe_load` parse validation to Phase 0.5. As in-phase verification for Phase 0.4, ran a dependency-free structural check instead (confirmed all 8 required top-level sections present and no tab characters). The full parse check becomes one of Phase 0.5's first verification tasks once PyYAML is available in the venv.
+
+**Alternatives considered:** Installing PyYAML globally just to satisfy the Phase 0.4 DoD (rejected — violates Phase 0.4 scope, which forbids library installs, and pollutes the global interpreter ahead of the venv being created in Phase 0.5). A stdlib-only approximate YAML parser (rejected — weaker guarantee than a real parse, not worth the complexity when Phase 0.5 is imminent).
+
+**Consequences:** Phase 0.4 is considered complete with structural verification only. Phase 0.5 must include a `config.yaml` parse step (with PyYAML added to `requirements.txt`) as one of its first verification tasks, and that step is recorded in Phase 0.5's Definition of Done.
