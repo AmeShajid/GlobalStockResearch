@@ -1,0 +1,123 @@
+# ThreadPulse — config.yaml
+#
+# SINGLE SOURCE OF TRUTH for every threshold, time window, and parameter.
+# Critical Rule #1: never hardcode a threshold in a script — read it from here.
+# All values below are STARTING values. They get refined during quarterly
+# threshold tuning (Milestone 11) by editing this one file — no code changes.
+#
+# Do NOT put credentials or secrets in this file. Secrets live in .env
+# (added in Phase 0.6). This file is safe to commit.
+#
+# All times/timestamps in the system are UTC. Local time is display-only.
+
+# ---------------------------------------------------------------------------
+# Reddit signal thresholds
+# Governs when Reddit chatter about a ticker is considered a signal.
+# ---------------------------------------------------------------------------
+reddit:
+  min_mention_count: 10          # minimum mentions before a ticker is a signal
+  min_velocity_increase_pct: 50  # % jump in mention rate to flag rising interest
+  min_sentiment_confidence_pct: 60  # discard FinBERT sentiment below this confidence
+  collection_interval_minutes: 30   # how often the Reddit collector runs
+  target_subreddits:             # subreddits the collector monitors
+    - wallstreetbets
+    - stocks
+    - investing
+    - Daytrading
+    - options
+    - pennystocks
+    - ValueInvesting
+
+# ---------------------------------------------------------------------------
+# Insider signal thresholds
+# Governs which OpenInsider transactions are significant. Dollar amounts USD.
+# ---------------------------------------------------------------------------
+insider:
+  min_transaction_value: 100000        # ignore insider buys/sells below this
+  high_significance_value: 500000      # transaction considered "high" significance
+  very_high_significance_value: 1000000  # transaction considered "very high"
+  lookback_window_days: 30             # how far back to scan insider filings
+
+# ---------------------------------------------------------------------------
+# Overlap detection time windows
+# When a ticker shows both Reddit buzz AND insider activity inside these
+# windows, it is flagged as an overlap.
+# ---------------------------------------------------------------------------
+overlap:
+  reddit_window_hours: 48   # Reddit activity counts if within this many hours
+  insider_window_days: 14   # insider activity counts if within this many days
+
+# ---------------------------------------------------------------------------
+# Price movement thresholds
+# Governs how price changes are classified after a signal.
+# ---------------------------------------------------------------------------
+price:
+  flat_significance_pct: 3.0       # moves smaller than this are treated as "flat"
+  volatility_multiplier: 1.5       # scales the flat threshold by recent volatility
+  measurement_intervals_days:      # trading days after a signal to measure outcome
+    - 1
+    - 3
+    - 7
+    - 14
+    - 30
+
+# ---------------------------------------------------------------------------
+# ML thresholds
+# Governs model training and degradation alerts. No ML runs until Milestone 9.
+# ---------------------------------------------------------------------------
+ml:
+  min_labeled_examples_per_category: 300  # need this many labels before training
+  degradation_f1_drop_alert: 0.05         # alert if F1 drops by this much
+
+# ---------------------------------------------------------------------------
+# System settings
+# Timezone is UTC everywhere. Paths are relative to the repository root —
+# never hardcode an absolute path like C:\Users\...
+# ---------------------------------------------------------------------------
+system:
+  timezone: UTC
+  database_name: threadpulse
+  log_file: logs/threadpulse.log
+  backup_location: backups/
+
+# ---------------------------------------------------------------------------
+# Exclusion list
+# Tickers / company names that consistently produce bad data and should never
+# be tracked. Starts empty; grown over time as problems are discovered.
+# ---------------------------------------------------------------------------
+exclusion_list: []
+
+# ---------------------------------------------------------------------------
+# Blocklist
+# Valid ticker symbols that are also common English words or abbreviations —
+# never extract these as tickers. Grows over time as false positives appear.
+# ---------------------------------------------------------------------------
+blocklist:
+  - A
+  - I
+  - IT
+  - ARE
+  - FOR
+  - ON
+  - BE
+  - DO
+  - GO
+  - OR
+  - AT
+  - BY
+  - SO
+  - IF
+  - ME
+  - MY
+  - US
+  - AM
+  - PM
+  - AN
+  - DD
+  - RH
+  - AI
+  - EV
+  - IPO
+  - CEO
+  - CFO
+  - ETF
