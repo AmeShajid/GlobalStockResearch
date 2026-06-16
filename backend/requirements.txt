@@ -1,0 +1,5 @@
+# ThreadPulse backend dependencies
+# Rebuild the environment with: pip install -r requirements.txt
+# Keep this file updated with every library installed into the venv.
+
+PyYAML==6.0.3

@@ -101,3 +101,23 @@ Append-only record of nontrivial choices. Each entry follows the format below. E
 **Alternatives considered:** Installing PyYAML globally just to satisfy the Phase 0.4 DoD (rejected — violates Phase 0.4 scope, which forbids library installs, and pollutes the global interpreter ahead of the venv being created in Phase 0.5). A stdlib-only approximate YAML parser (rejected — weaker guarantee than a real parse, not worth the complexity when Phase 0.5 is imminent).
 
 **Consequences:** Phase 0.4 is considered complete with structural verification only. Phase 0.5 must include a `config.yaml` parse step (with PyYAML added to `requirements.txt`) as one of its first verification tasks, and that step is recorded in Phase 0.5's Definition of Done.
+
+### 2026-06-16 — Microsoft Store Python 3.11.9 works fine for the venv (resolves the Phase 0.5 watch item)
+
+**Context:** The 2026-06-01 decision to keep the Microsoft Store Python 3.11.9 build flagged Phase 0.5 as the point to revisit if virtual-environment issues arose, because the Store build sandboxes some paths differently from the python.org build, which can occasionally affect virtual environments.
+
+**Decision:** Keep the Microsoft Store Python 3.11.9 build. During Phase 0.5, `python -m venv .venv` created `backend/.venv` with Python 3.11.9, activation via `.\.venv\Scripts\Activate.ps1` produced the `(.venv)` prefix with no execution-policy block needed, `python` resolved to the venv interpreter, and PyYAML installed and imported cleanly. No sandboxed-path quirks were observed, so there is no reason to switch to the python.org build.
+
+**Alternatives considered:** Reinstalling Python from python.org (rejected — the Store build works for venv creation, activation, and package installs, so a reinstall would be effort without benefit). Watching for issues but taking no decision (rejected — the watch item from 2026-06-01 should be explicitly closed so a future session does not re-investigate).
+
+**Consequences:** The Store build is confirmed adequate for the venv workflow on the primary Windows machine; the 2026-06-01 watch item is closed. If venv/global-tool path issues surface in a later phase, switching to the python.org build remains the fallback.
+
+### 2026-06-16 — Pin exact dependency versions in requirements.txt
+
+**Context:** Phase 0.5 created `backend/requirements.txt` as the single source for rebuilding the venv. A convention was needed for how versions are recorded so that `pip install -r requirements.txt` reproduces the same environment on both the Windows production machine and the MacBook dev machine.
+
+**Decision:** Pin exact versions with `==` (e.g. `PyYAML==6.0.3`) rather than leaving dependencies unpinned or using floating ranges (`>=`). Capture the version actually installed and record it.
+
+**Alternatives considered:** Unpinned dependencies (rejected — non-reproducible; a fresh install could pull a newer, untested version). Floating lower bounds like `PyYAML>=6.0` (rejected — same reproducibility risk across the two machines). Adding a lockfile tool such as pip-tools/poetry (rejected for now — overkill for the small dependency set this early; revisit if the dependency graph grows complex).
+
+**Consequences:** Reproducible environments across machines and over time, supporting Critical Rule #5 (data quality / reliability). Updating a dependency becomes a deliberate, logged change (bump the pin) rather than an accidental drift. Periodic manual review is needed to pick up security/bugfix updates since pins do not float.
