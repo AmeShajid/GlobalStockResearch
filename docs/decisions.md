@@ -121,3 +121,13 @@ Append-only record of nontrivial choices. Each entry follows the format below. E
 **Alternatives considered:** Unpinned dependencies (rejected — non-reproducible; a fresh install could pull a newer, untested version). Floating lower bounds like `PyYAML>=6.0` (rejected — same reproducibility risk across the two machines). Adding a lockfile tool such as pip-tools/poetry (rejected for now — overkill for the small dependency set this early; revisit if the dependency graph grows complex).
 
 **Consequences:** Reproducible environments across machines and over time, supporting Critical Rule #5 (data quality / reliability). Updating a dependency becomes a deliberate, logged change (bump the pin) rather than an accidental drift. Periodic manual review is needed to pick up security/bugfix updates since pins do not float.
+
+### 2026-06-16 — Install the Phase 1.2 database libraries early to satisfy the Phase 0.7 connection check
+
+**Context:** Phase 0.7's Definition of Done requires a Python script that opens a SQLAlchemy engine to the local `threadpulse` database and prints `connection ok`. That needs `SQLAlchemy`, a PostgreSQL driver (`psycopg2-binary`), and `python-dotenv` to read the password from `.env`. The blueprint formally lists these libraries under Phase 1.2, so the same fork seen with PyYAML in Phase 0.5 (install early vs. defer the live check) applied here.
+
+**Decision:** Install the three libraries early into `backend/.venv` now and pin them in `backend/requirements.txt` (`SQLAlchemy==2.0.51`, `psycopg2-binary==2.9.12`, `python-dotenv==1.2.2`), following the same "install early + pin" pattern used for PyYAML in Phase 0.5. This lets the Phase 0.7 DoD run for real this phase rather than deferring the live `connection ok` check to Phase 1.2.
+
+**Alternatives considered:** Defer the live check to Phase 1.2 (rejected — mirrors the Phase 0.4 YAML deferral, but here the libraries are small, stable, and the whole point of Phase 0.7 is to *verify* the database is reachable; deferring would leave the phase's core deliverable unproven). Installing globally instead of into the venv (rejected — pollutes the global interpreter and breaks reproducibility; the venv + pinned requirements is the established convention).
+
+**Consequences:** The Phase 0.7 connection check is fully runnable now. `requirements.txt` carries the DB libraries ahead of Phase 1.2, which is fine — Phase 1.2 simply finds them already present. Transitive dependencies (`greenlet`, `typing-extensions`) are installed automatically and left unpinned, consistent with pinning only direct dependencies.

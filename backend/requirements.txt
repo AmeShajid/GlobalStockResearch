@@ -3,3 +3,10 @@
 # Keep this file updated with every library installed into the venv.
 
 PyYAML==6.0.3
+
+# Database access (added in Phase 0.7 for the PostgreSQL connection check).
+# Formally listed under Phase 1.2; installed early so the connection can be
+# verified now. See docs/decisions.md.
+SQLAlchemy==2.0.51
+psycopg2-binary==2.9.12
+python-dotenv==1.2.2
