@@ -10,3 +10,8 @@ PyYAML==6.0.3
 SQLAlchemy==2.0.51
 psycopg2-binary==2.9.12
 python-dotenv==1.2.2
+
+# Scheduling (added in Phase 0.8 for the nightly database backup).
+# Installed early + pinned, same pattern as the DB libraries above.
+# See docs/decisions.md.
+APScheduler==3.11.2

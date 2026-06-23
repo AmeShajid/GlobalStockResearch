@@ -78,7 +78,12 @@ system:
   timezone: UTC
   database_name: threadpulse
   log_file: logs/threadpulse.log
-  backup_location: backups/
+  backup_location: backups/         # local nightly dump folder (gitignored)
+  offsite_backup_location: ""        # off-machine copy target (Google Drive folder
+                                     # or external drive). Blank = offsite copy
+                                     # skipped. A same-machine-only backup is not
+                                     # a real backup — set this when ready.
+  backup_hour_utc: 7                 # nightly DB backup runs at this UTC hour
 
 # ---------------------------------------------------------------------------
 # Exclusion list
